@@ -1,0 +1,17 @@
+-- Permanent Tablespace
+
+CREATE TABLESPACE p1_per_tablespace
+DATAFILE 'C:\UNISOFT\ORACLE21\ORADATA\ORCL\PDB2\p1_per_tablespace.dbf'
+SIZE 10M AUTOEXTEND ON NEXT 10M;
+
+
+ 
+-- Tempoaray Tablespace
+
+CREATE TEMPORARY TABLESPACE p1_temp_tablespace
+TEMPFILE 'C:\UNISOFT\ORACLE21\ORADATA\ORCL\PDB2\p1_temp_tablespace.dbf'
+SIZE 10M AUTOEXTEND ON NEXT 10M;
+
+
+
+

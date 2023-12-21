@@ -1,0 +1,12 @@
+CREATE PLUGGABLE DATABASE pdb2
+ADMIN USER pdb2_admin IDENTIFIED BY password2
+FILE_NAME_CONVERT = ('C:\UNISOFT\ORACLE21\ORADATA\ORCL\PDBSEED\','C:\UNISOFT\ORACLE21\ORADATA\ORCL\pdb2\')
+DEFAULT TABLESPACE users DATAFILE
+'C:\Unisoft\Oracle21\oradata\ORCL\pdb2\users02.dbf'
+SIZE 1M AUTOEXTEND ON NEXT 1M;
+
+
+alter pluggable database pdb2 open;
+
+alter pluggable database pdb2 save state;
+

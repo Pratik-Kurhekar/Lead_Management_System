@@ -1,0 +1,15 @@
+CREATE USER project1
+IDENTIFIED BY project1
+DEFAULT TABLESPACE p1_per_tablespace
+TEMPORARY TABLESPACE p1_temp_tablespace
+QUOTA unlimited on p1_per_tablespace
+QUOTA 10m on system;
+
+
+
+
+grant create session to project1;
+
+
+grant create table to project1;
+
