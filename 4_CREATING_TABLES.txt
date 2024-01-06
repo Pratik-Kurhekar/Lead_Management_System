@@ -1,0 +1,136 @@
+create table college ( college_id number constraint college_id_already_exist primary key,
+                       college_name varchar2(50) constraint college_name_cannot_be_null not null);
+
+create table qualification ( qid number constraint qualification_id_already_exist primary key,
+                             degree_name varchar2(30) constraint degree_name_cannot_be_null not null);
+
+create table stream ( stream_id number constraint stream_id_already_exist primary key,
+                      stream_name varchar2(20) constraint stram_name_cannot_be_null not null);
+
+create table college_sem ( sem_id number constraint sem_id_already_exist primary key,
+                           sem_name varchar2(20) constraint sem_name_should_be_unique_and_cannot_be_null Unique not null);
+
+create table college_year ( year_id number constraint year_id_already_exist primary key,
+                            year_name varchar2(20) 
+                            constraint year_name_should_be_unique_and_cannot_be_null Unique not null);
+
+create table course (course_id number constraint course_id_already_exist primary key,
+                     course_name varchar2(20) constraint course_name_should_be_unique_and_cannot_be_null unique not null ,
+                     fee number not null );
+
+create table staff ( staff_id number constraint staff_id_should_be_unique primary key,
+                     staff_name varchar2(20) constraint staff_name_cannot_be_null not null);
+
+create table source_master (source_id number constraint source_id_should_be_unique primary key,
+                            source_name varchar2(20) 
+                            constraint source_name_should_be_unique_and_cannot_be_null unique not null);
+
+create table country (country_id number constraint country_id_should_be_unique primary key,
+                      country_name varchar2(20) 
+                      constraint country_name_should_be_unique_and_cannot_be_null unique not null);
+
+create table state (state_id number constraint state_id_already_exist primary key,
+                    state_name varchar2(20) not null,
+                    country_id number ,
+                    constraint state_country_id_does_not_found_in_parent_table_country_fk foreign key(country_id)
+                    references country(country_id) );  
+
+create table city (city_id number constraint city_id_already_exit primary key,city_name varchar2(20) not null,
+                   state_id number, 
+                   constraint city_state_id_does_not_found_in_parent_table_state_fk
+                   foreign key(state_id) references state(state_id));
+
+create table enquiry_master (enquiry_id number constraint enquiry_master_enquiry_id_pk primary key,
+                             name varchar2(20) not null,
+                             phone_no number constraint enquiry_master_phone_no_uk unique
+                                             constraint enquiry_master_phone_no_check_phone_number_should_be_10_digits
+                                             check (length(phone_no) = 10),
+                             email varchar2(20) constraint invalid_email_id check ( email  like '%@%'),
+                             address varchar2(50) constraint enquiry_master_address not null,
+                             gender varchar2(1) constraint should_be_M_or_F_or_O check (gender in ('M','F','O')),
+                             age number,
+                             working varchar2(3) constraint working_should_be_YES_or_NO check(working  in ('YES','NO')),
+                             work_experience interval year to month,
+                             job_profile varchar2(20),
+                             city_id number ,
+                             constraint enquiry_master_city_id_fk foreign key(city_id) references city(city_id)
+                            );
+
+create table college_history(enquiry_id number,
+                                            constraint college_history_enquiry_id_fk
+                                            foreign key (enquiry_id)  references enquiry_master(enquiry_id),
+                             college_id number,
+                                            constraint college_history_college_id_fk
+                                            foreign key (college_id) references college(college_id),
+                             date_of_change date,
+                             sem_id number,
+                                            constraint college_history_sem_d_fk
+                                            foreign key (sem_id) references college_sem(sem_id),
+                             year_id number,
+                                            constraint college_year_year_id_fk
+                                            foreign key (year_id) references college_year(year_id),
+                             qid number,
+                                            constraint college_history_qid_fk
+                                            foreign key (qid) references qualification(qid),
+                             stream_id number,
+                                            constraint college_history_stream_id
+                                            foreign key (stream_id) references stream(stream_id),
+                             constraint college_history_enquiry_id_college_id_pk primary key (enquiry_id, college_id)
+                            );
+
+
+create table enquiry_handled (
+                              enquiry_id number,
+                                        constraint enquiry_handled_enquiry_id_fk foreign key(enquiry_id)
+                                        references enquiry_master(enquiry_id),
+                              assigned_date_to_staff date,
+                              		constraint enquiry_handled_enquiry_id_assigned_date_to_staff_pk 
+                                        primary key(enquiry_id,assigned_date_to_staff),
+                              handled_enquiry_date date,
+                              fee_suggested number default 0,
+                              staff_status varchar2(20) 
+                                        constraint staff_status_should_be_Assigned_or_Not_Assigned
+                                        check (lower(staff_status) in ('assigned','not assigned')),
+                              enquiry_status varchar2(10) 
+                                        constraint enquiry_status_should_be_Open_or_Closed
+                                        check (lower(enquiry_status) in ('open','closed')),
+                              course_id number,
+                                        constraint enquiry_handled_course_id_fk foreign key(course_id)
+                                        references course (course_id),
+                              staff_id number,
+                                        constraint enquiry_handled_staff_id_fk foreign key(staff_id)
+                                        references staff (staff_id),  
+                              visited_status varchar2(10) 
+                                        constraint visited_status_should_be_Yes_or_No
+                                        check (lower(visited_status) in ('yes','no')),
+                              registered_status varchar2(10) 
+                                        constraint registered_status_should_be_Open_or_Closed
+                                        check (lower(registered_status) in ('open','closed')),
+			      close_date_of_enquiry date,
+            		      close_enquiry_status varchar2(10) 
+                                        constraint registered_status_should_be_Manual_or_Auto
+                                        check (lower(close_enquiry_status) in ('manual','auto'))
+                              ); 
+
+create table follow_up (
+                        followup_id number constraint followup_id_already_exist primary key,
+                        staff_id number,
+                                 constraint follow_up_staff_id_fk foreign key (staff_id)
+                                 references staff (staff_id),
+                        enquiry_id number,
+                                   constraint follow_up_enquiry_id_fk foreign key (enquiry_id)
+                                   references enquiry_master (enquiry_id),
+                        status varchar2(20)
+                               constraint "status should be in format of x Days Left"
+                               check (lower(status) in ('7 Days Left','6 Days Left', '5 Days Left', 
+                                                        '4 Days Left', '3 Days Left', '2 Days Left','1 Day Left')),
+                        date_of_followup date,
+                        remark varchar2(20),
+                        next_followup_date date 
+                        );
+
+ 
+                              
+
+
+                
